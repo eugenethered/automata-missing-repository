@@ -36,6 +36,14 @@ class MissingRepositoryTestCase(unittest.TestCase):
         stored_multiples = self.repository.retrieve()
         self.assertEqual(multiple_missing, stored_multiples)
 
+    def test_should_batch_store_missing(self):
+        missing_1 = Missing('BTCOTC', Context.EXCHANGE, Market.BINANCE, 'Missing 1')
+        self.repository.store(missing_1)
+        missing_2 = Missing('BTCOTC', Context.EXCHANGE, Market.BINANCE, 'Missing 2')
+        self.repository.store(missing_2)
+        all_missing = self.repository.retrieve()
+        self.assertEqual(all_missing, [missing_1])
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -23,13 +23,25 @@ class MissingRepository:
         if MISSING_KEY not in self.options:
             raise MissingOptionError(f'missing option please provide option {MISSING_KEY}')
 
-    def store(self, multiple_missing: List[Missing]):
-        key = self.options[MISSING_KEY]
-        entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
-        self.cache.store(key, entities_to_store)
+    def store(self, missing):
+        if type(missing) is Missing:
+            self.__store_append(missing)
+        elif type(missing) is list:
+            self.__store_all(missing)
 
     def retrieve(self) -> List[Missing]:
         key = self.options[MISSING_KEY]
         raw_entities = self.cache.fetch(key, as_type=list)
         entities = list([deserialize_missing(raw) for raw in raw_entities])
         return entities
+
+    def __store_append(self, missing: Missing):
+        all_missing = self.retrieve()
+        if missing not in all_missing:
+            all_missing.append(missing)
+            self.store(all_missing)
+
+    def __store_all(self, multiple_missing):
+        key = self.options[MISSING_KEY]
+        entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
+        self.cache.store(key, entities_to_store)
