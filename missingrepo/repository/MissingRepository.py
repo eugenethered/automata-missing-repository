@@ -45,3 +45,7 @@ class MissingRepository:
         key = self.options[MISSING_KEY]
         entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
         self.cache.store(key, entities_to_store)
+
+    def is_already_missing(self, missing):
+        all_missing = self.retrieve()
+        return missing in all_missing
