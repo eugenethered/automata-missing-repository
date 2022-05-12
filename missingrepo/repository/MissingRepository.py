@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from cache.holder.RedisCacheHolder import RedisCacheHolder
@@ -42,9 +43,11 @@ class MissingRepository:
             self.store(all_missing)
 
     def __store_all(self, multiple_missing):
-        key = self.options[MISSING_KEY]
-        entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
-        self.cache.store(key, entities_to_store)
+        if len(multiple_missing) > 0:
+            key = self.options[MISSING_KEY]
+            entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
+            logging.debug(f'Storing {len(entities_to_store)} missing')
+            self.cache.store(key, entities_to_store)
 
     def is_already_missing(self, missing):
         all_missing = self.retrieve()
