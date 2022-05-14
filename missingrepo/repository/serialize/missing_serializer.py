@@ -1,4 +1,4 @@
-from utility.string_utility import is_empty
+from coreutility.string.string_utility import is_empty
 
 from missingrepo.Missing import Missing
 

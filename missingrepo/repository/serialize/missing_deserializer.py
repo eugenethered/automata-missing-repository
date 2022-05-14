@@ -1,6 +1,6 @@
 from core.market.Market import Market
 from core.missing.Context import Context
-from utility.json_utility import as_data
+from coreutility.collection.dictionary_utility import as_data
 
 from missingrepo.Missing import Missing
 
