@@ -14,14 +14,17 @@ MISSING_KEY = 'MISSING_KEY'
 class MissingRepository:
 
     def __init__(self, options):
+        self.log = logging.getLogger('MissingRepository')
         self.options = options
         self.__check_options()
         self.cache = RedisCacheHolder()
 
     def __check_options(self):
         if self.options is None:
+            self.log.warning(f'missing option please provide options {MISSING_KEY}')
             raise MissingOptionError(f'missing option please provide options {MISSING_KEY}')
         if MISSING_KEY not in self.options:
+            self.log.warning(f'missing option please provide option {MISSING_KEY}')
             raise MissingOptionError(f'missing option please provide option {MISSING_KEY}')
 
     def store(self, missing):
@@ -46,7 +49,7 @@ class MissingRepository:
         if len(multiple_missing) > 0:
             key = self.options[MISSING_KEY]
             entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
-            logging.debug(f'Storing {len(entities_to_store)} missing')
+            self.log.debug(f'Storing {len(entities_to_store)} missing')
             self.cache.store(key, entities_to_store)
 
     def is_already_missing(self, missing):
