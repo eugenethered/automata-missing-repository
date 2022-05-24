@@ -1,7 +1,6 @@
 import unittest
 
 from cache.holder.RedisCacheHolder import RedisCacheHolder
-from core.market.Market import Market
 from core.missing.Context import Context
 
 from missingrepo.Missing import Missing
@@ -23,29 +22,29 @@ class MissingRepositoryTestCase(unittest.TestCase):
         self.cache.delete('test:missing')
 
     def test_should_store_and_retrieve_missing(self):
-        missing = Missing(missing='BTCOTC', context=Context.EXCHANGE, market=Market.BINANCE, description='Missing instrument exchange config for instrument BTCOTC')
+        missing = Missing(missing='BTCOTC', context=Context.EXCHANGE, market='test', description='Missing instrument exchange config for instrument BTCOTC')
         self.repository.store([missing])
         stored_missing = self.repository.retrieve()
         self.assertEqual(missing, stored_missing[0])
 
     def test_should_store_multiple_missing(self):
-        missing_exchange_config = Missing(missing='BTCOTC', context=Context.EXCHANGE, market=Market.BINANCE, description='Missing instrument exchange config for instrument BTCOTC')
-        missing_trade_config = Missing(missing='OTC/BTC', context=Context.TRADE, market=Market.BINANCE, description='Missing trade config for instrument OTC/BTC')
+        missing_exchange_config = Missing(missing='BTCOTC', context=Context.EXCHANGE, market='test', description='Missing instrument exchange config for instrument BTCOTC')
+        missing_trade_config = Missing(missing='OTC/BTC', context=Context.TRADE, market='test', description='Missing trade config for instrument OTC/BTC')
         multiple_missing = [missing_exchange_config, missing_trade_config]
         self.repository.store(multiple_missing)
         stored_multiples = self.repository.retrieve()
         self.assertEqual(multiple_missing, stored_multiples)
 
     def test_should_batch_store_missing(self):
-        missing_1 = Missing('BTCOTC', Context.EXCHANGE, Market.BINANCE, 'Missing 1')
+        missing_1 = Missing('BTCOTC', Context.EXCHANGE, 'test', 'Missing 1')
         self.repository.store(missing_1)
-        missing_2 = Missing('BTCOTC', Context.EXCHANGE, Market.BINANCE, 'Missing 2')
+        missing_2 = Missing('BTCOTC', Context.EXCHANGE, 'test', 'Missing 2')
         self.repository.store(missing_2)
         all_missing = self.repository.retrieve()
         self.assertEqual(all_missing, [missing_1])
 
     def test_should_already_missing(self):
-        missing_1 = Missing('BTCOTC', Context.EXCHANGE, Market.BINANCE, 'Missing 1')
+        missing_1 = Missing('BTCOTC', Context.EXCHANGE, 'test', 'Missing 1')
         self.repository.store(missing_1)
         self.assertTrue(self.repository.is_already_missing(missing_1))
 

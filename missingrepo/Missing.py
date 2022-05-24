@@ -8,8 +8,8 @@ from core.missing.Context import Context
 class Missing:
     missing: str
     context: Context
-    market: Market
+    market: str
     description: str
 
     def __eq__(self, other):
-        return f'{self.missing}{self.context.value}{self.market.value}' == f'{other.missing}{other.context.value}{other.market.value}'
+        return f'{self.missing}{self.context.value}{self.market}' == f'{other.missing}{other.context.value}{other.market}'
