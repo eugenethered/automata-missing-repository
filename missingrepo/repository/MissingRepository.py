@@ -14,7 +14,7 @@ MISSING_KEY = 'MISSING_KEY'
 class MissingRepository:
 
     def __init__(self, options):
-        self.log = logging.getLogger('MissingRepository')
+        self.log = logging.getLogger(__name__)
         self.options = options
         self.__check_options()
         self.cache = RedisCacheHolder()
