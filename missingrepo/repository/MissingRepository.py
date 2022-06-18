@@ -28,20 +28,18 @@ class MissingRepository:
             self.log.warning(f'missing option please provide option {MISSING_KEY}')
             raise MissingOptionError(f'missing option please provide option {MISSING_KEY}')
 
+    def store(self, missings):
+        self.__store_all(missings)
+
     def append(self, missing):
         self.log.debug(f'appending missing:[{missing}]')
         self.__store_append(missing)
-
-    def store(self, missing):
-        if type(missing) is Missing:
-            self.__store_append(missing)
-        elif type(missing) is list:
-            self.__store_all(missing)
 
     def retrieve(self) -> List[Missing]:
         key = self.options[MISSING_KEY]
         raw_entities = self.cache.fetch(key, as_type=list)
         entities = list([deserialize_missing(raw) for raw in raw_entities])
+        self.log.debug(f'Retrieving {len(entities)} missing')
         return entities
 
     def remove(self, missing):
@@ -52,14 +50,13 @@ class MissingRepository:
         all_missing = self.retrieve()
         if missing not in all_missing:
             all_missing.append(missing)
-            self.store(all_missing)
+            self.__store_all(all_missing)
 
     def __store_remove(self, missing: Missing):
         all_missing = self.retrieve()
         self.log.debug(f'missings before remove:[{len(all_missing)}]')
         all_missing_without_missing = [m for m in all_missing if m != missing]
-        self.log.debug(f'missings after remove:[{len(all_missing_without_missing)}]')
-        self.store(all_missing_without_missing)
+        self.__store_all(all_missing_without_missing)
 
     def __store_all(self, multiple_missing):
         if len(multiple_missing) > 0:
