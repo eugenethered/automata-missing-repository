@@ -14,7 +14,8 @@ MISSING_KEY = 'MISSING_KEY'
 class MissingRepository:
 
     def __init__(self, options):
-        self.log = logging.getLogger(__name__)
+        self.log = logging.getLogger('MissingRepository')
+        self.log.info('initializing')
         self.options = options
         self.__check_options()
         self.cache = RedisCacheHolder()
@@ -26,6 +27,10 @@ class MissingRepository:
         if MISSING_KEY not in self.options:
             self.log.warning(f'missing option please provide option {MISSING_KEY}')
             raise MissingOptionError(f'missing option please provide option {MISSING_KEY}')
+
+    def append(self, missing):
+        self.log.debug(f'appending missing:[{missing}]')
+        self.__store_append(missing)
 
     def store(self, missing):
         if type(missing) is Missing:
@@ -39,11 +44,22 @@ class MissingRepository:
         entities = list([deserialize_missing(raw) for raw in raw_entities])
         return entities
 
+    def remove(self, missing):
+        self.log.debug(f'removing missing:[{missing}]')
+        self.__store_remove(missing)
+
     def __store_append(self, missing: Missing):
         all_missing = self.retrieve()
         if missing not in all_missing:
             all_missing.append(missing)
             self.store(all_missing)
+
+    def __store_remove(self, missing: Missing):
+        all_missing = self.retrieve()
+        self.log.debug(f'missings before remove:[{len(all_missing)}]')
+        all_missing_without_missing = [m for m in all_missing if m != missing]
+        self.log.debug(f'missings after remove:[{len(all_missing_without_missing)}]')
+        self.store(all_missing_without_missing)
 
     def __store_all(self, multiple_missing):
         if len(multiple_missing) > 0:
