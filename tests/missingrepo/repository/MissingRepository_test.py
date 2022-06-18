@@ -23,8 +23,8 @@ class MissingRepositoryTestCase(unittest.TestCase):
         self.cache = RedisCacheHolder(options)
         self.repository = MissingRepository(options)
 
-    # def tearDown(self):
-    #     self.cache.delete('test:missing')
+    def tearDown(self):
+        self.cache.delete('test:missing')
 
     def test_should_store_and_retrieve_missing(self):
         missing = Missing(missing='BTCOTC', context=Context.EXCHANGE, market='test', description='Missing instrument exchange config for instrument BTCOTC')
