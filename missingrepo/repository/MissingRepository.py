@@ -29,11 +29,17 @@ class MissingRepository:
             raise MissingOptionError(f'missing option please provide option {MISSING_KEY}')
 
     def store(self, missings):
-        self.__store_all(missings)
+        if len(missings) > 0:
+            key = self.options[MISSING_KEY]
+            entities_to_store = list([serialize_missing(missing) for missing in missings])
+            self.log.debug(f'Storing {len(entities_to_store)} missing')
+            self.cache.store(key, entities_to_store)
 
     def append(self, missing):
         self.log.debug(f'appending missing:[{missing}]')
-        self.__store_append(missing)
+        key = self.options[MISSING_KEY]
+        serialized = serialize_missing(missing)
+        self.cache.append_store(key, serialized)
 
     def retrieve(self) -> List[Missing]:
         key = self.options[MISSING_KEY]
@@ -44,26 +50,11 @@ class MissingRepository:
 
     def remove(self, missing):
         self.log.debug(f'removing missing:[{missing}]')
-        self.__store_remove(missing)
-
-    def __store_append(self, missing: Missing):
-        all_missing = self.retrieve()
-        if missing not in all_missing:
-            all_missing.append(missing)
-            self.__store_all(all_missing)
-
-    def __store_remove(self, missing: Missing):
         all_missing = self.retrieve()
         self.log.debug(f'missings before remove:[{len(all_missing)}]')
         all_missing_without_missing = [m for m in all_missing if m != missing]
-        self.__store_all(all_missing_without_missing)
-
-    def __store_all(self, multiple_missing):
-        if len(multiple_missing) > 0:
-            key = self.options[MISSING_KEY]
-            entities_to_store = list([serialize_missing(missing) for missing in multiple_missing])
-            self.log.debug(f'Storing {len(entities_to_store)} missing')
-            self.cache.store(key, entities_to_store)
+        key = self.options[MISSING_KEY]
+        self.cache.overwrite_store(key, all_missing_without_missing)
 
     def is_already_missing(self, missing):
         all_missing = self.retrieve()
