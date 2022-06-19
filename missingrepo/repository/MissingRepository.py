@@ -52,7 +52,7 @@ class MissingRepository:
         self.log.debug(f'removing missing:[{missing}]')
         all_missing = self.retrieve()
         self.log.debug(f'missings before remove:[{len(all_missing)}]')
-        all_missing_without_missing = [m for m in all_missing if m != missing]
+        all_missing_without_missing = [serialize_missing(m) for m in all_missing if m != missing]
         key = self.options[MISSING_KEY]
         self.cache.overwrite_store(key, all_missing_without_missing)
 
